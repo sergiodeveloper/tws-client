@@ -42,78 +42,6 @@ const response = await client.execute('myOperation', {
 });
 ```
 
-### Installation
-
-```bash
-npm install @tws-js/server
-```
-
-### Example
-
-Start the server:
-
-```typescript
-import { Operation, Schema, createServer } from '@tws-js/server';
-
-const schema = new Schema({
-  hello: new Operation({
-    input: {
-      name: {
-        type: 'string',
-        required: true,
-        description: 'The name to greet',
-      },
-    },
-    output: {
-      type: 'object',
-      properties: {
-        message: {
-          type: 'string',
-          description: 'The greeting message',
-        },
-      },
-    },
-    handler: ({ name }, metadata) => { // "name" automatically typed as string
-      return {
-        // Typescript will warn if "message" is not a string,
-        // as required by the output
-        message: `Hello ${name}`,
-      };
-    },
-  }),
-});
-
-const server = createServer({
-  schema,
-  path: '/tws',
-  logger: {
-    error: (message) => console.error(message),
-  },
-  enablePlayground: true,
-});
-
-server.listen(3000);
-```
-
-Send a request to the server:
-
-```bash
-curl -X POST \
-  http://localhost:3000/tws \
-  -H "Content-Type: application/json" \
-  -d '{ "operation": "hello", "input": { "name": "TWS" } }'
-```
-
-Check the response:
-
-```json
-{
-  "data": {
-    "message": "Hello TWS"
-  }
-}
-```
-
 ## Collaborating
 
 ### Setup
@@ -123,10 +51,10 @@ nvm use 18
 npm install
 ```
 
-### Running
+### Building
 
 ```bash
-npm start
+npm run build
 ```
 
 ### Testing
