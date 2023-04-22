@@ -1,0 +1,12 @@
+{
+  "threshold": 100,
+  "ignore": [
+    "node_modules/**/*.*",
+    ".git/**/*.*",
+    "dist/**/*.*",
+    "src/**/*.*",
+    "examples/**/*.*"
+  ],
+  "minLines": 6,
+  "minChars": 400
+}

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "name": "@tws-js/client-example1",
+  "description": "Type-Safe Client Example",
+  "license": "MIT",
+  "main": "client.ts",
+  "scripts": {
+    "server": "ts-node server.ts",
+    "client": "ts-node client.ts",
+    "types": "npx tws-types --server http://localhost:3000/tws/schema --output server-types.ts"
+  },
+  "devDependencies": {
+    "@tws-js/client": "file:../..",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  }
+}
