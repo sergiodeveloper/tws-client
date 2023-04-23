@@ -1,5 +1,5 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "@tws-js/client",
   "description": "Type-Safe Web Server Client",
   "license": "MIT",
@@ -38,8 +38,8 @@
     "ext": "ts,js,json"
   },
   "dependencies": {
+    "@tws-js/common": "^1.0.0",
     "axios": "^1.3.6",
-    "json5": "^2.2.3",
-    "@tws-js/server": "^1.0.0"
+    "json5": "^2.2.3"
   }
 }

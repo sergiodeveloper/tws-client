@@ -3,7 +3,7 @@ import type {
   OutputTypeDefinition,
   InvocationInputType,
   OutputType,
-} from '@tws-js/server';
+} from '@tws-js/common';
 import axios, { AxiosResponse } from 'axios';
 
 export type Logger = {
