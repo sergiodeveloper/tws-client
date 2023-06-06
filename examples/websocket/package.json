@@ -12,7 +12,11 @@
   "devDependencies": {
     "@tws-js/client": "file:../..",
     "@tws-js/server": "file:../../../tws",
+    "@types/ws": "^8.5.4",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "ws": "^8.13.0"
   }
 }

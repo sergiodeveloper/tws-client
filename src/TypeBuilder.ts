@@ -56,40 +56,70 @@ export class TypeBuilder {
     return '';
   }
 
-  static convertOperationToTypeScript(options: {
+  static convertBaseOperationToTypeScript(options: {
     name: string;
-    operation: ImportedOperation;
+    baseOperation: ImportedOperation;
   }): string {
     let string = '';
 
     string += TypeBuilder.createJsDocDescription({
-      title: options.operation.title || options.name,
-      description: options.operation.description,
+      title: options.baseOperation.title || options.name,
+      description: options.baseOperation.description,
     });
 
-    string += `${options.name}: ${JSON5.stringify(options.operation, null, 2)};`;
+    string += `${options.name}: ${JSON5.stringify(options.baseOperation, null, 2)};`;
 
     return string;
   }
 
   static convertSchemaToTypeScript(schema: ImportedSchema): string {
     let string = 'export type TwsSchema = {\n';
-    string += '  operations: {\n';
 
+    string += '  operations: {\n';
     string += Object.entries(schema.operations)
       .map(
         ([operationName, operation]) =>
-          TypeBuilder.convertOperationToTypeScript({
+          TypeBuilder.convertBaseOperationToTypeScript({
             name: operationName,
-            operation,
+            baseOperation: operation,
           })
             .split('\n')
             .map((line) => `    ${line}`.trimEnd())
             .join('\n') + '\n',
       )
       .join('\n');
-
     string += '  };\n';
+
+    string += '  clientEvents: {\n';
+    string += Object.entries(schema.clientEvents)
+      .map(
+        ([operationName, operation]) =>
+          TypeBuilder.convertBaseOperationToTypeScript({
+            name: operationName,
+            baseOperation: operation,
+          })
+            .split('\n')
+            .map((line) => `    ${line}`.trimEnd())
+            .join('\n') + '\n',
+      )
+      .join('\n');
+    string += '  };\n';
+
+    string += '  serverEvents: {\n';
+    string += Object.entries(schema.serverEvents)
+      .map(
+        ([operationName, operation]) =>
+          TypeBuilder.convertBaseOperationToTypeScript({
+            name: operationName,
+            baseOperation: operation,
+          })
+            .split('\n')
+            .map((line) => `    ${line}`.trimEnd())
+            .join('\n') + '\n',
+      )
+      .join('\n');
+    string += '  };\n';
+
     string += '};\n';
 
     return string;
