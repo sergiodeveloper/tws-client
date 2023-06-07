@@ -123,16 +123,21 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
 
   async processEventFromServer(rawEvent: string): Promise<void> {
     let event: {
-      type: 'call' | 'response';
-      operation: string;
-      eventId: string;
-      payload: string;
+      type?: 'call' | 'response';
+      operation?: string;
+      eventId?: string;
+      payload?: string;
     };
 
     try {
       event = JSON.parse(rawEvent);
     } catch (error) {
       this.logger.error(`Server sent invalid JSON: ${rawEvent}`);
+      return;
+    }
+
+    if (!event.type || !event.operation || !event.eventId || !event.payload) {
+      this.logger.error(`Server sent an invalid event: ${rawEvent}`);
       return;
     }
 
@@ -152,7 +157,9 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
       const listener = this.eventListeners[event.operation];
 
       if (!listener) {
-        this.logger.error(`Server sent an event but there is no listener for it: ${event}`);
+        this.logger.error(
+          `Server sent an event but there is no listener for it: ${JSON.stringify(event)}`,
+        );
         return;
       }
 
@@ -192,7 +199,7 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
         delete this.responseListeners[event.eventId];
       }
     } else {
-      this.logger.error(`Server sent unknown event type "${event.type}"`);
+      this.logger.error(`Server sent unknown event type: "${event.type}"`);
     }
   }
 
@@ -204,7 +211,7 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
   }): void {
     if (!this.serverEventSender) {
       this.logger.error(
-        `Cannot send event to server because no handler was defined. Call setServerEventSender().`,
+        'Cannot send event to server because no handler was defined. Call setServerEventSender().',
       );
       return;
     }
@@ -223,10 +230,11 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
   private waitForResponse<ClientEventName extends keyof TwsSchema['clientEvents']>(
     eventId: string,
   ): Promise<OutputType<TwsSchema['clientEvents'][ClientEventName]['output']>> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
-        this.logger.error(`Timeout while waiting for response to event ${eventId}`);
+        this.logger.error(`Timeout while waiting for response to event "${eventId}"`);
         delete this.responseListeners[eventId];
+        reject(new Error(`Timeout while waiting for response to event "${eventId}"`));
       }, WEBSOCKET_OPERATION_RESPONSE_TIMEOUT);
 
       this.responseListeners[eventId] = (event) => {

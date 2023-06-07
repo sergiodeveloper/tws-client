@@ -45,12 +45,12 @@ describe('TypeBuilder', () => {
     expect(result).toEqual('');
   });
 
-  test('convertOperationToTypeScript', async () => {
+  test('convertBaseOperationToTypeScript', async () => {
     jest.spyOn(TypeBuilder, 'createJsDocDescription').mockImplementation(() => 'jsdocdesc\n');
 
-    const result = TypeBuilder.convertOperationToTypeScript({
+    const result = TypeBuilder.convertBaseOperationToTypeScript({
       name: 'name',
-      operation: {
+      baseOperation: {
         title: 'Title',
         description: 'Description',
         input: {
@@ -85,9 +85,9 @@ name: {
   test('convertOperationToTypeScript with no title and a description', async () => {
     jest.spyOn(TypeBuilder, 'createJsDocDescription').mockImplementation(() => 'jsdocdesc\n');
 
-    const result = TypeBuilder.convertOperationToTypeScript({
+    const result = TypeBuilder.convertBaseOperationToTypeScript({
       name: 'name',
-      operation: {
+      baseOperation: {
         description: 'Description',
         input: {
           a: { type: 'string' },
@@ -119,7 +119,7 @@ name: {
 
   test('convertSchemaToTypeScript', async () => {
     jest
-      .spyOn(TypeBuilder, 'convertOperationToTypeScript')
+      .spyOn(TypeBuilder, 'convertBaseOperationToTypeScript')
       .mockImplementation(() => 'operationtsc');
 
     const result = TypeBuilder.convertSchemaToTypeScript({
@@ -145,12 +145,42 @@ name: {
           },
         },
       },
+      clientEvents: {
+        c: {
+          title: 'Title',
+          description: 'Description',
+          input: {
+            e: { type: 'string' },
+          },
+          output: {
+            type: 'string',
+          },
+        },
+      },
+      serverEvents: {
+        d: {
+          title: 'Title',
+          description: 'Description',
+          input: {
+            f: { type: 'string' },
+          },
+          output: {
+            type: 'string',
+          },
+        },
+      },
     });
 
     expect(result).toEqual(`export type TwsSchema = {
   operations: {
     operationtsc
 
+    operationtsc
+  };
+  clientEvents: {
+    operationtsc
+  };
+  serverEvents: {
     operationtsc
   };
 };
@@ -259,6 +289,8 @@ name: {
           },
         },
       },
+      clientEvents: {},
+      serverEvents: {},
     });
 
     jest.spyOn(TypeBuilder, 'convertSchemaToTypeScript').mockReturnValue('schematsc');
@@ -282,6 +314,8 @@ name: {
           },
         },
       },
+      clientEvents: {},
+      serverEvents: {},
     });
 
     expect(fs.writeFileSync).toHaveBeenCalledWith('output.ts', 'schematsc');

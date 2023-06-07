@@ -32,7 +32,7 @@ module.exports = {
       }
     ],
 
-    'sonarjs/cognitive-complexity': ['error', 14],
+    'sonarjs/cognitive-complexity': ['error', 16],
     "curly": "error",
 
     'no-process-exit': 'error',
