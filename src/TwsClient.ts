@@ -36,14 +36,14 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
 
   async execute<OperationName extends keyof TwsSchema['operations']>(
     operation: OperationName,
-    input: InvocationInputType<TwsSchema['operations'][OperationName]['input']>,
+    input?: InvocationInputType<TwsSchema['operations'][OperationName]['input']>,
   ): Promise<OutputType<TwsSchema['operations'][OperationName]['output']>> {
     const response: AxiosResponse<string> = await axios.request({
       url: this.url,
       method: 'POST',
       data: {
         operation,
-        input,
+        input: input ?? {},
       },
       headers: this.headers,
       responseType: 'text',

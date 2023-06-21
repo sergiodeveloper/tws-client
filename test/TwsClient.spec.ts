@@ -89,6 +89,41 @@ describe('TwsClient', () => {
     });
   });
 
+  test('execute without input', async () => {
+    const headers = { test: 'ok' };
+    const logger = { error: jest.fn() };
+
+    const client = {
+      url: 'http://localhost:3300',
+      headers,
+      logger,
+    };
+
+    const axiosRequestSpy = jest.spyOn(axios, 'request').mockResolvedValue({
+      status: 200,
+      data: JSON.stringify({
+        data: 'ok',
+      }),
+    });
+
+    const result = await TwsClient.prototype.execute.call(client, 'test');
+
+    expect(result).toEqual('ok');
+    expect(axiosRequestSpy).toHaveBeenCalledTimes(1);
+    expect(axiosRequestSpy).toHaveBeenCalledWith({
+      url: 'http://localhost:3300',
+      method: 'POST',
+      data: {
+        operation: 'test',
+        input: {},
+      },
+      headers: {
+        test: 'ok',
+      },
+      responseType: 'text',
+    });
+  });
+
   test('execute with error on status code', async () => {
     const headers = { test: 'ok' };
     const logger = { error: jest.fn() };
