@@ -70,12 +70,12 @@ export class TypeBuilder {
     const stringInput =
       Object.entries(options.operation.input).length > 0
         ? JSON5.stringify(options.operation.input, null, 2).replace(/\n/g, '\n  ')
-        : 'Record<string, unknown>';
+        : 'Record<string, never>';
 
     const stringOutput =
       Object.entries(options.operation.output).length > 0
         ? JSON5.stringify(options.operation.output, null, 2).replace(/\n/g, '\n  ')
-        : 'Record<string, unknown>';
+        : 'Record<string, never>';
 
     string += `${options.name}: {\n`;
     string += options.operation.title ? `  title: '${options.operation.title}',\n` : '';
