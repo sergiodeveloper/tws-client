@@ -67,7 +67,24 @@ export class TypeBuilder {
       description: options.operation.description,
     });
 
-    string += `${options.name}: ${JSON5.stringify(options.operation, null, 2)};`;
+    const stringInput =
+      Object.entries(options.operation.input).length > 0
+        ? JSON5.stringify(options.operation.input, null, 2).replace(/\n/g, '\n  ')
+        : 'Record<string, unknown>';
+
+    const stringOutput =
+      Object.entries(options.operation.output).length > 0
+        ? JSON5.stringify(options.operation.output, null, 2).replace(/\n/g, '\n  ')
+        : 'Record<string, unknown>';
+
+    string += `${options.name}: {\n`;
+    string += options.operation.title ? `  title: '${options.operation.title}',\n` : '';
+    string += options.operation.description
+      ? `  description: '${options.operation.description}',\n`
+      : '';
+    string += `  input: ${stringInput},\n`;
+    string += `  output: ${stringOutput},\n`;
+    string += '};';
 
     return string;
   }

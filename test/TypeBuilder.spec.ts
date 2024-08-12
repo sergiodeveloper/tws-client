@@ -117,6 +117,67 @@ name: {
     });
   });
 
+  test('convertOperationToTypeScript with no title and no description', async () => {
+    jest.spyOn(TypeBuilder, 'createJsDocDescription').mockImplementation(() => 'jsdocdesc\n');
+
+    const result = TypeBuilder.convertOperationToTypeScript({
+      name: 'name',
+      operation: {
+        input: {
+          a: { type: 'string' },
+        },
+        output: {
+          type: 'string',
+        },
+      },
+    });
+
+    expect(result).toEqual(`jsdocdesc
+name: {
+  input: {
+    a: {
+      type: 'string',
+    },
+  },
+  output: {
+    type: 'string',
+  },
+};`);
+
+    expect(TypeBuilder.createJsDocDescription).toHaveBeenCalledWith({
+      title: 'name',
+      description: undefined,
+    });
+  });
+
+  test('convertOperationToTypeScript with no input and no output', async () => {
+    jest.spyOn(TypeBuilder, 'createJsDocDescription').mockImplementation(() => 'jsdocdesc\n');
+
+    const result = TypeBuilder.convertOperationToTypeScript({
+      name: 'name',
+      operation: {
+        title: 'Title',
+        description: 'Description',
+        input: {},
+        // @ts-expect-error no output defined
+        output: {},
+      },
+    });
+
+    expect(result).toEqual(`jsdocdesc
+name: {
+  title: 'Title',
+  description: 'Description',
+  input: Record<string, unknown>,
+  output: Record<string, unknown>,
+};`);
+
+    expect(TypeBuilder.createJsDocDescription).toHaveBeenCalledWith({
+      title: 'Title',
+      description: 'Description',
+    });
+  });
+
   test('convertSchemaToTypeScript', async () => {
     jest
       .spyOn(TypeBuilder, 'convertOperationToTypeScript')
