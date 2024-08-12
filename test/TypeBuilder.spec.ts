@@ -168,8 +168,8 @@ name: {
 name: {
   title: 'Title',
   description: 'Description',
-  input: Record<string, unknown>,
-  output: Record<string, unknown>,
+  input: Record<string, never>,
+  output: Record<string, never>,
 };`);
 
     expect(TypeBuilder.createJsDocDescription).toHaveBeenCalledWith({
