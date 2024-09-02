@@ -138,14 +138,20 @@ export class TypeBuilder {
     };
   }
 
-  static async getSchemaFromServer(serverUrl: string): Promise<ImportedSchema> {
+  static async getSchemaFromServer(options: {
+    serverUrl: string;
+    httpAgent?: unknown;
+    httpsAgent?: unknown;
+  }): Promise<ImportedSchema> {
     let response: AxiosResponse<string>;
 
     try {
       response = await axios.request({
-        url: serverUrl,
+        url: options.serverUrl,
         method: 'GET',
         responseType: 'text',
+        httpAgent: options.httpAgent,
+        httpsAgent: options.httpsAgent,
       });
     } catch (error) {
       throw new Error(`Failed to fetch schema from server: ${error}`);
@@ -169,7 +175,9 @@ export class TypeBuilder {
   static async main(argv: string[]) {
     const options = TypeBuilder.getServerAndOutputFromCli(argv);
 
-    const schema = await TypeBuilder.getSchemaFromServer(options.serverUrl);
+    const schema = await TypeBuilder.getSchemaFromServer({
+      serverUrl: options.serverUrl,
+    });
 
     const stringifiedData = TypeBuilder.convertSchemaToTypeScript(schema);
 
