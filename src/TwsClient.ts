@@ -27,11 +27,21 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
   private readonly url: string;
   private readonly headers: Record<string, string>;
   private readonly logger: Logger;
+  private readonly httpAgent: unknown;
+  private readonly httpsAgent: unknown;
 
-  constructor(options: { url: string; headers?: Record<string, string>; logger?: Logger }) {
+  constructor(options: {
+    url: string;
+    headers?: Record<string, string>;
+    logger?: Logger;
+    httpAgent?: unknown;
+    httpsAgent?: unknown;
+  }) {
     this.url = options.url;
     this.headers = options.headers || {};
     this.logger = options.logger || console;
+    this.httpAgent = options.httpAgent;
+    this.httpsAgent = options.httpsAgent;
   }
 
   async execute<OperationName extends keyof TwsSchema['operations']>(
@@ -47,6 +57,8 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
       },
       headers: this.headers,
       responseType: 'text',
+      httpAgent: this.httpAgent,
+      httpsAgent: this.httpsAgent,
     });
 
     if (response.status !== 200) {

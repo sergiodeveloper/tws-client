@@ -260,7 +260,11 @@ name: {
       data: JSON.stringify({ ok: 'test' }),
     });
 
-    const result = await TypeBuilder.getSchemaFromServer('http://localhost:4222');
+    const result = await TypeBuilder.getSchemaFromServer({
+      serverUrl: 'http://localhost:4222',
+      httpAgent: 'testHttpAgent',
+      httpsAgent: 'testHttpsAgent',
+    });
 
     expect(result).toEqual({ ok: 'test' });
 
@@ -268,15 +272,19 @@ name: {
       url: 'http://localhost:4222',
       method: 'GET',
       responseType: 'text',
+      httpAgent: 'testHttpAgent',
+      httpsAgent: 'testHttpsAgent',
     });
   });
 
   test('getSchemaFromServer with error on request', async () => {
     jest.spyOn(axios, 'request').mockRejectedValue(new Error('test'));
 
-    await expect(TypeBuilder.getSchemaFromServer('http://localhost:5555')).rejects.toThrowError(
-      'Failed to fetch schema from server: Error: test',
-    );
+    await expect(
+      TypeBuilder.getSchemaFromServer({
+        serverUrl: 'http://localhost:5555',
+      }),
+    ).rejects.toThrowError('Failed to fetch schema from server: Error: test');
   });
 
   test('getSchemaFromServer with error on status code', async () => {
@@ -285,9 +293,11 @@ name: {
       data: 'test',
     });
 
-    await expect(TypeBuilder.getSchemaFromServer('http://localhost:4000')).rejects.toThrowError(
-      'Server responded with status code 500: test',
-    );
+    await expect(
+      TypeBuilder.getSchemaFromServer({
+        serverUrl: 'http://localhost:4000',
+      }),
+    ).rejects.toThrowError('Server responded with status code 500: test');
   });
 
   test('getSchemaFromServer with error on invalid json', async () => {
@@ -296,7 +306,11 @@ name: {
       data: 'test',
     });
 
-    await expect(TypeBuilder.getSchemaFromServer('http://localhost:4000')).rejects.toThrowError(
+    await expect(
+      TypeBuilder.getSchemaFromServer({
+        serverUrl: 'http://localhost:4000',
+      }),
+    ).rejects.toThrowError(
       'Failed to parse schema: SyntaxError: Unexpected token e in JSON at position 1',
     );
   });
@@ -328,7 +342,7 @@ name: {
 
     await TypeBuilder.main(['node', 'tws', '--server', 'myserverurl', '--output', 'output.ts']);
 
-    expect(TypeBuilder.getSchemaFromServer).toHaveBeenCalledWith('myserverurl');
+    expect(TypeBuilder.getSchemaFromServer).toHaveBeenCalledWith({ serverUrl: 'myserverurl' });
 
     expect(TypeBuilder.convertSchemaToTypeScript).toHaveBeenCalledWith({
       operations: {
