@@ -1,4 +1,4 @@
-import { Operation, Schema, createServer } from '@tws-js/server';
+import { Operation, Schema, HTTPServerHelper } from '@tws-js/server';
 
 const schema = new Schema({
   hello: new Operation({
@@ -159,23 +159,21 @@ const schema = new Schema({
     },
     handler: ({ name, price, session }) => {
       return {
-        message: `Hello ${name}. The price is ${price}, session ${session}`,
+        message: `Product ${name}. The price is ${price}, session ${session}`,
       };
     },
   }),
-});
-
-const server = createServer({
-  schema,
-  path: '/tws',
+}, {
   logger: {
     error: (message) => console.error(message),
   },
   enablePlayground: true,
 });
 
-server.listen(3000);
+HTTPServerHelper.create({
+  port: 3000,
+  schema,
+  path: '/tws',
+});
+
 console.log('Server listening on port 3000');
-
-
-// https://pakstech.com/blog/npx-script/

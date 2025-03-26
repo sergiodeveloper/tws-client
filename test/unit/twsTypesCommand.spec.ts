@@ -1,4 +1,4 @@
-import { TypeBuilder } from '../src/TypeBuilder';
+import { TypeBuilder } from '../../src/TypeBuilder';
 
 describe('twsTypesCommand', () => {
   afterEach(() => {
@@ -8,7 +8,7 @@ describe('twsTypesCommand', () => {
   test('root', async () => {
     jest.spyOn(TypeBuilder, 'main').mockImplementation();
 
-    require('../src/twsTypesCommand');
+    require('../../src/twsTypesCommand');
 
     expect(TypeBuilder.main).toHaveBeenCalledWith(process.argv);
   });

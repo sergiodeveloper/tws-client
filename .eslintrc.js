@@ -5,7 +5,7 @@ module.exports = {
     'prettier',
     'eslint-plugin-sonarjs'
   ],
-  ignorePatterns: ['dist', 'jest.config.js', '.eslintrc.js', 'examples'],
+  ignorePatterns: ['dist', '.eslintrc.js', 'examples'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',

@@ -17,9 +17,18 @@ export type ImportedOperation = {
   output: OutputTypeDefinition;
 };
 
+export type ImportedServerEvent = {
+  title?: string;
+  description?: string;
+  input: InputTypeDefinition;
+};
+
 export type ImportedSchema = {
   operations: {
     [operationName: string]: ImportedOperation;
+  };
+  events: {
+    [eventName: string]: ImportedServerEvent;
   };
 };
 
@@ -29,6 +38,13 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
   private readonly logger: Logger;
   private readonly httpAgent: unknown;
   private readonly httpsAgent: unknown;
+  private eventListeners: {
+    [eventName: string | symbol]:
+      | ((
+          event: InvocationInputType<TwsSchema['events'][keyof TwsSchema['events']]['input']>,
+        ) => Promise<void> | void)
+      | undefined;
+  } = {};
 
   constructor(options: {
     url: string;
@@ -83,5 +99,53 @@ export class TwsClient<TwsSchema extends ImportedSchema> {
     }
 
     return data.data;
+  }
+
+  async processEvent(rawEvent: string): Promise<void> {
+    let event: {
+      event: string;
+      data: unknown;
+    };
+
+    try {
+      event = JSON.parse(rawEvent);
+    } catch (error) {
+      this.logger.error(`Server sent an event with invalid JSON: ${rawEvent}`);
+      return;
+    }
+
+    if (!event.event || event.data === undefined) {
+      this.logger.error(`Server sent an invalid event: ${rawEvent}`);
+      return;
+    }
+
+    const payload = event.data as InvocationInputType<
+      TwsSchema['events'][keyof TwsSchema['events']]['input']
+    >;
+
+    const listener = this.eventListeners[event.event];
+
+    if (!listener) {
+      this.logger.error(
+        `Server sent an event but there is no listener for it: ${JSON.stringify(event)}`,
+      );
+      return;
+    }
+
+    try {
+      await listener(payload);
+    } catch (error) {
+      this.logger.error(`Listener for event "${event.event}" threw an error: ${error}`);
+      return;
+    }
+  }
+
+  on<EventName extends keyof TwsSchema['events']>(
+    eventName: EventName,
+    listener: (
+      event: InvocationInputType<TwsSchema['events'][EventName]['input']>,
+    ) => Promise<void> | void,
+  ): void {
+    this.eventListeners[eventName] = listener;
   }
 }

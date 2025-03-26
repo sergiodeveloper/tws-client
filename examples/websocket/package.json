@@ -5,13 +5,17 @@
   "license": "MIT",
   "main": "client.ts",
   "scripts": {
-    "server": "bun run server.ts",
-    "client": "bun run client.ts",
+    "server": "bun server.ts",
+    "client": "bun client.ts",
     "types": "npx tws-types --server http://localhost:3000/tws/schema --output server-types.ts"
   },
   "devDependencies": {
     "@tws-js/client": "file:../..",
     "@tws-js/server": "^2.2.1",
     "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
   }
 }

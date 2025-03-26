@@ -3,7 +3,7 @@
 TWS Client can generate types from the server schema. This allows you to use the generated types in your client code, so you are able to get type safety and autocompletion during development.
 
 ```sh
-cd examples/typing
+cd examples/websocket
 nvm use 20
 rm -rf node_modules package-lock.json
 npm install
@@ -13,7 +13,7 @@ npm run server
 Then on another terminal:
 
 ```sh
-cd examples/typing
+cd examples/websocket
 nvm use 20
 npm run client
 ```
@@ -22,7 +22,7 @@ Experiment with this example by modifying `server.ts` and stopping and running `
 Then run the following command to update the types on the client:
 
 ```sh
-cd examples/typing
+cd examples/websocket
 npm run types
 ```
 
@@ -31,7 +31,7 @@ Check the file `client.ts` to see the new types having effect on the code.
 Then run the client:
 
 ```sh
-cd examples/typing
+cd examples/websocket
 nvm use 20
 npm run client
 ```

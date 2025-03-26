@@ -166,4 +166,5 @@ export type TwsSchema = {
       },
     };
   };
+  events: Record<string, never>;
 };

@@ -6,7 +6,6 @@ node_modules/
 src/
 test/
 .eslintrc.js
-.trc
-jest.config.js
+bunfig.toml
 package-lock.json
 tsconfig.json

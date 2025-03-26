@@ -21,6 +21,24 @@ async function main() {
   });
 
   console.log(`The sum is ${sum}`);
+
+  const createProductResult = await client.execute('createProduct', {
+    name: 'Telescope',
+    price: 100,
+    brand: 'Celestron',
+    category: 'Optics',
+    description: 'A telescope',
+    tags: ['telescope', 'optics'],
+    labels: [{
+      name: 'New',
+      value: 'true',
+    }],
+    rating: 5,
+    session: 'first',
+    visible: true,
+  });
+
+  console.log(`Created product: ${createProductResult.message}`);
 }
 
 main();

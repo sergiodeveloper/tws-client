@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { TwsClient } from '../src/index';
+import { TwsClient } from '../../src/index';
 
 describe('TwsClient', () => {
   afterEach(() => {
@@ -212,5 +212,171 @@ describe('TwsClient', () => {
       },
       responseType: 'text',
     });
+  });
+
+  test('processEvent with invalid JSON', async () => {
+    const thisInstance = {
+      logger: {
+        error: jest.fn(),
+      },
+      eventListeners: {
+        testEvent: jest.fn().mockResolvedValue('testEventResponse'),
+      },
+    };
+
+    const event = 'Invalid JSON';
+
+    const result = await TwsClient.prototype.processEvent.call(thisInstance, event);
+
+    expect(result).toBeUndefined();
+
+    expect(thisInstance.logger.error).toHaveBeenCalledTimes(1);
+    expect(thisInstance.logger.error).toHaveBeenCalledWith(
+      `Server sent an event with invalid JSON: ${event}`,
+    );
+
+    expect(thisInstance.eventListeners.testEvent).not.toHaveBeenCalled();
+  });
+
+  test('processEvent with invalid event', async () => {
+    const thisInstance = {
+      logger: {
+        error: jest.fn(),
+      },
+      eventListeners: {
+        testEvent: jest.fn().mockResolvedValue('testEventResponse'),
+      },
+    };
+
+    const event = {
+      invalidEvent: 'testEvent',
+    };
+
+    const result = await TwsClient.prototype.processEvent.call(thisInstance, JSON.stringify(event));
+
+    expect(result).toBeUndefined();
+
+    expect(thisInstance.logger.error).toHaveBeenCalledTimes(1);
+    expect(thisInstance.logger.error).toHaveBeenCalledWith(
+      `Server sent an invalid event: ${JSON.stringify(event)}`,
+    );
+
+    expect(thisInstance.eventListeners.testEvent).not.toHaveBeenCalled();
+  });
+
+  test('processEvent successfully', async () => {
+    const thisInstance = {
+      logger: {
+        error: jest.fn(),
+      },
+      eventListeners: {
+        testEvent: jest.fn().mockResolvedValue('testEventResponse'),
+      },
+    };
+
+    const event = {
+      event: 'testEvent',
+      data: 'testPayload',
+    };
+
+    const result = await TwsClient.prototype.processEvent.call(thisInstance, JSON.stringify(event));
+
+    expect(result).toBeUndefined();
+
+    expect(thisInstance.eventListeners.testEvent).toHaveBeenCalledTimes(1);
+    expect(thisInstance.eventListeners.testEvent).toHaveBeenCalledWith('testPayload');
+
+    expect(thisInstance.logger.error).not.toHaveBeenCalled();
+  });
+
+  test('processEvent with call and missing event listener', async () => {
+    const thisInstance = {
+      logger: {
+        error: jest.fn(),
+      },
+      eventListeners: {},
+    };
+
+    const event = {
+      event: 'testEvent',
+      data: 'testPayload',
+    };
+
+    const result = await TwsClient.prototype.processEvent.call(thisInstance, JSON.stringify(event));
+
+    expect(result).toBeUndefined();
+
+    expect(thisInstance.logger.error).toHaveBeenCalledTimes(1);
+    expect(thisInstance.logger.error).toHaveBeenCalledWith(
+      `Server sent an event but there is no listener for it: ${JSON.stringify(event)}`,
+    );
+  });
+
+  test('processEvent with call and error in event listener', async () => {
+    const thisInstance = {
+      logger: {
+        error: jest.fn(),
+      },
+      eventListeners: {
+        testEvent: jest.fn().mockRejectedValue(new Error('testError')),
+      },
+    };
+
+    const event = {
+      event: 'testEvent',
+      data: 'testPayload',
+    };
+
+    const result = await TwsClient.prototype.processEvent.call(thisInstance, JSON.stringify(event));
+
+    expect(result).toBeUndefined();
+
+    expect(thisInstance.logger.error).toHaveBeenCalledTimes(1);
+    expect(thisInstance.logger.error).toHaveBeenCalledWith(
+      `Listener for event "${event.event}" threw an error: Error: testError`,
+    );
+  });
+
+  test('processEvent with an unknown event type', async () => {
+    const thisInstance = {
+      logger: {
+        error: jest.fn(),
+      },
+      eventListeners: {
+        testEvent: jest.fn(),
+      },
+    };
+
+    const event = {
+      invalidEvent: 'testEvent',
+    };
+
+    const result = await TwsClient.prototype.processEvent.call(thisInstance, JSON.stringify(event));
+
+    expect(result).toBeUndefined();
+
+    expect(thisInstance.logger.error).toHaveBeenCalledTimes(1);
+    expect(thisInstance.logger.error).toHaveBeenCalledWith(
+      `Server sent an invalid event: ${JSON.stringify(event)}`,
+    );
+
+    expect(thisInstance.eventListeners.testEvent).not.toHaveBeenCalled();
+  });
+
+  test('on', () => {
+    const thisInstance = {
+      eventListeners: {
+        testEvent: undefined,
+      },
+    };
+
+    const eventName = 'testEvent';
+    const listener = jest.fn();
+
+    const result = TwsClient.prototype.on.call(thisInstance, eventName, listener);
+
+    expect(result).toBeUndefined();
+
+    expect(thisInstance.eventListeners[eventName]).toEqual(listener);
   });
 });
